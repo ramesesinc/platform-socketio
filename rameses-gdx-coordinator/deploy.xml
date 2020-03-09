@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="deploy" default="deploy" basedir=".">
+    <target name="deploy">
+        <property name="project.name" value="rameses-gdx-coordinator"/>
+        <property name="target.dir" value="C:/ETRACS_Server/gdx-muni-connector/lib"/>
+        <property name="source.dir" value="${basedir}/dist"/>
+        <property name="source.file" value="${source.dir}/${project.name}.jar" />
+        <echo message="${source.file}" />
+        <delete>
+            <fileset file="${target.dir}/${project.name}.jar" />
+        </delete>
+        <copy todir="${target.dir}">
+            <fileset dir="${source.dir}" />
+        </copy>
+    </target>
+</project>

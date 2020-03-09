@@ -1,0 +1,16 @@
+import com.rameses.common.*;
+import com.rameses.annotations.*;
+
+class SocketIoCoordinatorService
+{
+    @XConnection('gdx-coordinator')
+    def conn;
+
+    @Context
+    def context;
+
+    @Schedule()
+    public void load( task ) {
+        println 'Loading gdx coordinator ... done';
+    }
+}

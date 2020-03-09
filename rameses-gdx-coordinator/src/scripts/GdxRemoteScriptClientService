@@ -1,0 +1,66 @@
+import com.rameses.annotations.*;
+import com.rameses.common.*;
+import com.rameses.util.*;
+
+class GdxRemoteScriptClientService {
+	@Context
+    def appContext;
+
+    @XConnection("gdx-coordinator")
+    def remoteConn;
+
+    @Resource("ScriptService")
+    def scriptSvc;
+
+    @ProxyMethod
+    public void registerServices() {
+        if( remoteConn == null ) {
+            println "Register scripts not executed. gdx-coordinator connection not defined";
+	    	return;
+        }
+
+        println "Start registering script definition to the node-gdx server";
+
+        def list = new HashSet();
+        def h = { m->
+            def fileName = "remote/" + m.filename;
+            def info = scriptSvc.findScriptInfo(fileName);	
+            def metaInfo = info.getMetaInfo(  appContext );
+            def newInfo = [:]
+            newInfo.name = info.name.substring("remote/".length() );
+            newInfo.serviceName = newInfo.name;
+            newInfo.methods = [];
+            metaInfo.methods.each { k,v->
+            	def mt = [:];
+        		mt.name = v.name;
+        		mt.parameters = v.parameters;
+        		mt.returnValue = v.returnValue;
+            	newInfo.methods << mt;
+            }
+            list << newInfo;
+        } as ScanFileFilter;
+        appContext.scanFiles( "scripts/remote", h, null);
+        remoteConn.send(list)
+        println "Remote services registration completed...";
+    }
+
+    @ProxyMethod
+    public void notifyStatus( def o ) {
+        if( o.status == "server-startup" ) {
+            //re-register the services
+            registerServices();
+        }
+    }
+
+    @ProxyMethod
+    public void shutdown() {
+        String id = remoteConn.conf.queue;
+        remoteSvc.unregister(id);
+        println "unregistered to server";
+    }
+
+    @ProxyMethod
+    public void onMessage( def o ) {
+        //
+    }
+}

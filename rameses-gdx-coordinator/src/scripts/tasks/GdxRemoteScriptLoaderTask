@@ -1,0 +1,27 @@
+import com.rameses.annotations.*;
+
+class GdxRemoteScriptLoaderTask {
+
+    @Service("GdxRemoteScriptClientService")	
+    def svc;
+    
+    private boolean registered = false;	
+
+    @Schedule
+    public void load( params ) {
+	if (registered) {
+            return;
+        }
+        
+        println "Starting gdx-coordinator remote script loader";
+    	svc.registerServices();
+ 	
+	registered = true;
+    }
+
+    @Shutdown
+    public void shutdown( def evt ) {
+    	svc.shutdown();
+    }
+
+}
