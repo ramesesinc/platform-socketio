@@ -7,6 +7,7 @@ build-impl.xml~
 Thumbs.db
 *.lnk
 _bak
+*.bat
 
 /**/dist
 /**/build
