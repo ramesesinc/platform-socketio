@@ -23,11 +23,11 @@ class GdxRemoteScriptClientService {
 
         def list = new HashSet();
         def h = { m->
-            def fileName = "remote/" + m.filename;
+            def fileName = "gdx/" + m.filename;
             def info = scriptSvc.findScriptInfo(fileName);	
             def metaInfo = info.getMetaInfo(  appContext );
             def newInfo = [:]
-            newInfo.name = info.name.substring("remote/".length() );
+            newInfo.name = info.name.substring("gdx/".length() );
             newInfo.serviceName = newInfo.name;
             newInfo.methods = [];
             metaInfo.methods.each { k,v->
@@ -39,7 +39,7 @@ class GdxRemoteScriptClientService {
             }
             list << newInfo;
         } as ScanFileFilter;
-        appContext.scanFiles( "scripts/remote", h, null);
+        appContext.scanFiles( "scripts/gdx", h, null);
         remoteConn.send(list)
         println "Remote services registration completed...";
     }

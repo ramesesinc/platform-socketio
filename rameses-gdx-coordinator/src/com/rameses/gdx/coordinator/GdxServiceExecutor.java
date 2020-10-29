@@ -1,9 +1,12 @@
 package com.rameses.gdx.coordinator;
 
 import com.rameses.osiris3.core.AbstractContext;
+import com.rameses.osiris3.script.messaging.ScriptConnection;
 import com.rameses.osiris3.server.JsonUtil;
+import com.rameses.osiris3.xconnection.XConnection;
 import com.rameses.service.ScriptServiceContext;
 import com.rameses.service.ServiceProxy;
+import groovy.lang.GroovyObject;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,29 +23,28 @@ public class GdxServiceExecutor {
     public Object process(Map params) {
         String serviceName = get(params, "service", "").toString();
         String methodName = get(params, "method", "").toString();
+        String moduleName = get(params, "module", "").toString();
+        String connectionName = get(params, "connection", "").toString();
         Map args = (Map) get(params, "args", new HashMap());
-
-        Map appConf = new HashMap();
-        appConf.put("app.host", get(conf, "app.host", "localhost:8570"));
-        appConf.put("app.cluster", get(conf, "app.cluster", "osiris3"));
-        appConf.put("app.context", get(conf, "app.context", "gdx"));
-        appConf.put("readTimeout", get(conf, "timeout", "60000"));
-        appConf.put("debug", get(conf, "debug", false));
-
+        
         System.out.println("Config =========================");
-        for (Object key: appConf.keySet()){
-            Object value = appConf.get(key);
-            System.out.println(key + " " + value);  
-        } 
+        System.out.println("Service Name:" + serviceName);
+        System.out.println("Method Name:" + methodName);
+        System.out.println("Module Name:" + moduleName);
+        System.out.println("Connection Name:" + connectionName);
         
         try {
-            ScriptServiceContext ctx = new ScriptServiceContext(appConf);
-            ServiceProxy svc = (ServiceProxy) ctx.create("remote/" + serviceName);
-            Object result = svc.invoke(methodName, new Object[]{args});
-            Map res = new HashMap();
-            res.put("status", "OK");
-            res.put("data", toJson(result));
-            return res;
+            XConnection xc = context.getConnection(connectionName);
+            if (xc instanceof ScriptConnection) {
+                Object obj = ((ScriptConnection)xc).create("gdx/" + serviceName, new HashMap());
+                Object result = ((GroovyObject)obj).invokeMethod(methodName, new Object[]{args});
+                Map res = new HashMap();
+                res.put("status", "OK");
+                res.put("data", toJson(result));
+                return res;
+            } else {
+                throw new Exception("Connection provider not supported." );
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             Map err = new HashMap();
