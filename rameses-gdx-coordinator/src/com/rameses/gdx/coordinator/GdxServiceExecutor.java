@@ -24,7 +24,7 @@ public class GdxServiceExecutor {
         String serviceName = get(params, "service", "").toString();
         String methodName = get(params, "method", "").toString();
         String moduleName = get(params, "module", "").toString();
-        String connectionName = get(params, "connection", "").toString();
+        String connectionName = get(params, "connection", "default").toString();
         Map args = (Map) get(params, "args", new HashMap());
         
         System.out.println("Config =========================");
