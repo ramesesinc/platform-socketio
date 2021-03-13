@@ -61,7 +61,11 @@ public class GdxNodeProxyInvocationHandler implements InvocationHandler {
         params.put("service", this.serviceName);
         params.put("method", methodName);
         if (args.length > 0) {
-            params.put("args", args[0]);
+            Object data = ((Map)args[0]).remove("data");
+            Map remoteConfig = (Map)((Map)args[0]).remove("remoteConfig");
+            params.put("args", data);
+            params.put("module", remoteConfig.get("module"));
+            params.put("connection", remoteConfig.get("connection"));
         }
 
         try {
