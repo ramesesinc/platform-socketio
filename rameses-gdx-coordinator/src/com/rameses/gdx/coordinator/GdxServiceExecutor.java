@@ -26,6 +26,13 @@ public class GdxServiceExecutor {
         String moduleName = get(params, "module", "").toString();
         String connectionName = get(params, "connection", "default").toString();
         Map args = (Map) get(params, "args", new HashMap());
+
+        Map remoteConfig = (Map)get(args, "remoteConfig", null);
+        if (remoteConfig != null) {
+            moduleName = remoteConfig.get("module").toString();
+            connectionName = remoteConfig.get("connection").toString();
+            args = (Map) get(args, "data", null);
+        }
         
         System.out.println("Config =========================");
         System.out.println("Service Name:" + serviceName);
@@ -75,5 +82,13 @@ public class GdxServiceExecutor {
             jsonData = JsonUtil.toString(result);
         }
         return jsonData;
+    }
+
+    private void printData(Map params) {
+        System.out.println("process (params) ======================== ");
+        for (Object key : params.keySet()) {
+            System.out.println("  ** " + key + ": " + params.get(key));
+        }
+        System.out.println("==========================================");
     }
 }
